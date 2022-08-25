@@ -7,7 +7,7 @@ class Parking
 		@color=a[-1]
 	end
 
-	def show_status
+	def show_status(total_slots)
 		if total_slots==0
 			puts"No slots are created"
 		else
@@ -15,25 +15,28 @@ class Parking
 		end
 	end
 
-	def plate_no_for_color(car_color)
+	def plate_no_for_color(car_color,count)
 		if(car_color==@color)
 			print"#{@plate_no} "
-			return 0
+			count+=1
 		end
+		return count
 	end
 
-	def slot_no_for_color(car_color)
+	def slot_no_for_color(car_color,count)
 		if(car_color==@color)
 			print"#{@slot_no} "
-			return 0
+			count+=1
 		end
+		return count
 	end
 
-	def slot_no_for_plate_no(car_color)
+	def slot_no_for_plate_no(car_color,count)
 		if(car_color==@plate_no)
 			print"#{@slot_no} "
-			return 0
+			count+=1
 		end
+		return count
 	end
 end	
 
@@ -53,8 +56,12 @@ end
 n=gets.chomp.to_i
 hsh={}
 x=gets.chomp.split(" ")
-total_slots=x[-1].to_i
-puts "created parking of #{total_slots} slots"
+if x[0]=="create_parking_lot"
+	total_slots=x[-1].to_i
+	puts "created parking of #{total_slots} slots"
+else
+	puts "invalid command first create parking slots"
+end
 n.times do |k|
 
 	a=gets.chomp.split(" ")
@@ -72,29 +79,38 @@ n.times do |k|
 		when "status"
 			puts "Slot No. | Plate Number | Colour"
 			    hsh.each do |key,value|
-			    	hsh[key].show_status
+			    	hsh[key].show_status(total_slots)
 			    end
 
 		when "plate_numbers_for_cars_with_colour"
+			count=0
 			hsh.each do |key,value|
-				if hsh[key].plate_no_for_color(a[-1])!=0
-					puts"#{a[-1]} does not exist"
-				end
+				count=hsh[key].plate_no_for_color(a[-1],count)
 			end
+			if count==0
+				print "not found"
+			end
+			puts""
 
 		when "slot_numbers_for_cars_with_colour"
+			count=0
 			hsh.each do |key,value|
-				if hsh[key].slot_no_for_color(a[-1])!=0
-					puts"#{a[-1]} does not exist"
-				end
+				 count=hsh[key].slot_no_for_color(a[-1],count)
 			end
+			if count==0
+				print "not found"
+			end
+			puts""
 
 		when "slot_number_for_registration_number"
+			count=0
 			hsh.each do |key,value|
-				if hsh[key].slot_no_for_plate_no(a[-1])!=0
-					puts"#{a[-1]} does not exist"
-				end
+				count=hsh[key].slot_no_for_plate_no(a[-1],count)
 			end
+			if count==0
+				print "not found"
+			end
+			puts""
 
 		when "add"
 			total_slots+=a[1].to_i
@@ -104,6 +120,9 @@ n.times do |k|
 			if (total_slots-hsh.size)>=a[1].to_i
 				total_slots-=a[1].to_i
 				puts"#{a[1]} slots removed"
+			elsif a[1].to_i>total_slots
+				puts"invalid no of slots"
+					
 			else
 				puts"Sorry, slots are occupied can't remove slots"
 			end
